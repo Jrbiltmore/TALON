@@ -514,7 +514,7 @@ if __name__ == "__main__":
     cosmic_communication.apply_quantum_communication_protocols()
 
     # Transmit quantum data securely
-    data_to_transmit = "Hello, this is a test message."
+    data_to_transmit = "Hello, Proxima Centauri. This is Earth broadcasting to Proxima Centauri. Come in Alistaire."
     cosmic_communication.transmit_quantum_data(data_to_transmit, "Proxima Centauri")
 
     # Apply quantum error correction
