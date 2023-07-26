@@ -140,9 +140,45 @@ def main():
     # Solve the continuous optimization problem using VQE with the SPSA optimizer
     best_params, min_value = solve_continuous_optimization_problem(objective_function, initial_params, optimizer='SPSA')
 
+    # Define the target state
+    target_state = np.array([1 / np.sqrt(2), 0, 0, 1 / np.sqrt(2)])
+
+    # Create a random initial quantum circuit
+    num_qubits = 2
+    quantum_circuit = QuantumCircuit(num_qubits)
+    quantum_circuit.h(0)
+    quantum_circuit.cx(0, 1)
+
+    # Define the fidelity function to be maximized by the optimizer
+    def fidelity(params):
+        # Apply variational parameters to the quantum circuit
+        circuit_copy = quantum_circuit.copy()
+        circuit_copy.ry(params[0], 0)
+        circuit_copy.ry(params[1], 1)
+
+        # Simulate the quantum circuit to get the output state
+        backend = Aer.get_backend('statevector_simulator')
+        result = execute(circuit_copy, backend).result()
+        output_state = result.get_statevector()
+
+        # Calculate fidelity with the target state
+        return np.abs(np.dot(target_state.conj(), output_state)) ** 2
+
+    # Set the initial parameters for the variational quantum circuit
+    initial_params = [0.1, 0.2]
+
+    # Use SPSA optimizer for maximizing fidelity
+    optimizer = SPSA(maxiter=500)
+
+    # Run the optimization to find the optimal parameters
+    best_params, max_fidelity = solve_continuous_optimization_problem(fidelity, initial_params, optimizer=optimizer)
+
     # Display the result
-    print("Best Parameters:", best_params)
-    print("Corresponding Minimum Value:", min_value)
+    print("Best Parameters for Quantum Circuit:")
+    print(best_params)
+    print("Maximum Fidelity with Target State:")
+    print(max_fidelity)
+
 
 if __name__ == "__main__":
     main()
